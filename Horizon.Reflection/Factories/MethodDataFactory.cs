@@ -56,11 +56,11 @@ namespace Horizon.Reflection
         }
 
         /// <summary>
-        /// Are the two <see cref="MethodData"/> objects equivalent?
+        /// Is the specified left hand side <see cref="MethodData"/> equivalent to the specified right hand side <see cref="MethodData"/>?
         /// </summary>
-        /// <param name="lhs">Left hand side.</param>
-        /// <param name="rhs">Right hand side.</param>
-        /// <returns>True if the two <see cref="MethodData"/> objects are equivalent; otherwise, false.</returns>
+        /// <param name="lhs">Left hand side <see cref="MethodData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="MethodData"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="MethodData"/> is equivalent to the specified right hand side <see cref="MethodData"/>; otherwise, false.</returns>
         protected override bool AreEquivalent(MethodData lhs, MethodData rhs)
         {
             return lhs.Name == rhs.Name &&

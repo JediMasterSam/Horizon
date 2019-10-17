@@ -79,12 +79,13 @@ namespace Horizon.Reflection
         /// <returns>Members defined in the base type.</returns>
         protected abstract IEnumerable<TMemberData> GetBaseData(TypeData typeData, ModifierFlags modifierFlags);
 
+       
         /// <summary>
-        /// Are the two <see cref="TMemberData"/> objects equivalent?
+        /// Is the specified left hand side <see cref="TMemberData"/> equivalent to the specified right hand side <see cref="TMemberData"/>?
         /// </summary>
-        /// <param name="lhs">Left hand side.</param>
-        /// <param name="rhs">Right hand side.</param>
-        /// <returns>True if the two <see cref="TMemberData"/> objects are equivalent; otherwise, false.</returns>
+        /// <param name="lhs">Left hand side <see cref="TMemberData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="TMemberData"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="TMemberData"/> is equivalent to the specified right hand side <see cref="TMemberData"/>; otherwise, false.</returns>
         protected abstract bool AreEquivalent(TMemberData lhs, TMemberData rhs);
     }
 }

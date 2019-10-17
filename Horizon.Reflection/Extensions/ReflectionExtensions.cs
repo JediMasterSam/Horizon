@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Horizon.Reflection
 {
-    public static class Reflector
+    public static class ReflectionExtensions
     {
         private static readonly Dictionary<Type, TypeData> Types = new Dictionary<Type, TypeData>();
 

@@ -16,7 +16,7 @@ namespace Horizon.Reflection
         private readonly FieldInfo _fieldInfo;
 
         /// <summary>
-        /// Collection of every <see cref="Attribute"/> applied to the current <see cref="FieldData"/>.
+        /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="FieldData"/>.
         /// </summary>
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
@@ -109,6 +109,12 @@ namespace Horizon.Reflection
             }
         }
 
+        /// <summary>
+        /// Sets the value of the current <see cref="FieldData"/> within the specified <see cref="object"/>.
+        /// </summary>
+        /// <param name="obj">Object that contains the current <see cref="FieldData"/>.</param>
+        /// <param name="value">Field value.</param>
+        /// <returns>True if the value was set successfully; otherwise, false.</returns>
         public bool TrySetValue(object obj, object value)
         {
             try

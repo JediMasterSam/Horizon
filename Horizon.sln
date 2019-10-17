@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Horizon.OData", "Horizon.OD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Horizon.OData.Test", "Horizon.OData.Test\Horizon.OData.Test.csproj", "{03B3E440-76D7-4C70-92FE-C014309BE38C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Horizon.Collections", "Horizon.Collections\Horizon.Collections.csproj", "{48F185A6-A029-4A03-847C-79D21C96D8BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{03B3E440-76D7-4C70-92FE-C014309BE38C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03B3E440-76D7-4C70-92FE-C014309BE38C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03B3E440-76D7-4C70-92FE-C014309BE38C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C0C001A3-7197-4D39-9914-BF20B1360773} = {FF35E70C-16D6-4A69-89C4-613CE319980F}

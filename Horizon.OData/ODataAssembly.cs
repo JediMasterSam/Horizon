@@ -16,7 +16,7 @@ namespace Horizon.OData
 
             foreach (var typeData in assembly.GetAssemblyData().Types)
             {
-                if (!(typeData & DefinitionFlags.Class)) continue;
+                if (!(typeData & DefinitionFlags.Class) || typeData | (ModifierFlags.Abstract | ModifierFlags.Static | ModifierFlags.NotPublic)) continue;
 
                 if (typeData.Implements(profileTypeData))
                 {

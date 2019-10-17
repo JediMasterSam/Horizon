@@ -1,35 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Horizon.Numerics;
 
 namespace Horizon.Reflection
 {
+    /// <summary>
+    /// Represents a cached <see cref="Type"/>.
+    /// </summary>
     public sealed class TypeData : ModifierData
     {
+        /// <summary>
+        /// Cached <see cref="Type"/>.
+        /// </summary>
         private readonly Type _type;
 
+        /// <summary>
+        /// The <see cref="DefinitionFlags"/> for the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly BitField<DefinitionFlags> _definitionFlags;
 
+        /// <summary>
+        /// The declaring <see cref="AssemblyData"/> of the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<AssemblyData> _assembly;
 
+        /// <summary>
+        /// The base <see cref="TypeData"/> of the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<TypeData> _baseType;
 
+        /// <summary>
+        /// The declaring <see cref="TypeData"/> of the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<TypeData> _declaringType;
 
+        /// <summary>
+        /// Collection of every <see cref="TypeData"/> that the current <see cref="TypeData"/> implements.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<TypeData>> _interfaces;
 
+        /// <summary>
+        /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
+        /// <summary>
+        /// Collection of every <see cref="FieldData"/> within the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<FieldData>> _fields;
 
+        /// <summary>
+        /// Collection of every <see cref="PropertyData"/> within the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<PropertyData>> _properties;
 
+        /// <summary>
+        /// Collection of every <see cref="MethodData"/> within the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<MethodData>> _methods;
 
+        /// <summary>
+        /// Collection of every <see cref="ConstructorData"/> within the current <see cref="TypeData"/>.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<ConstructorData>> _constructors;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="TypeData"/>.
+        /// </summary>
+        /// <param name="type">Type.</param>
         internal TypeData(Type type) : base(type.GetModifierFlags(), type.Name, type.FullName)
         {
             _type = type;
@@ -45,64 +84,85 @@ namespace Horizon.Reflection
             _constructors = new Lazy<IReadOnlyList<ConstructorData>>(() => ConstructorDataFactory.Instance.Get(this));
         }
 
+        ///<inheritdoc cref="_assembly"/>
         public AssemblyData Assembly => _assembly.Value;
 
+        ///<inheritdoc cref="_baseType"/>
         public TypeData BaseType => _baseType.Value;
 
+        ///<inheritdoc cref="_declaringType"/>
         public TypeData DeclaringType => _declaringType.Value;
 
+        ///<inheritdoc cref="_interfaces"/>
         public IReadOnlyList<TypeData> Interfaces => _interfaces.Value;
 
+        ///<inheritdoc cref="_attributes"/>
         public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
 
+        ///<inheritdoc cref="_fields"/>
         public IReadOnlyList<FieldData> Fields => _fields.Value;
 
+        ///<inheritdoc cref="_properties"/>
         public IReadOnlyList<PropertyData> Properties => _properties.Value;
 
+        ///<inheritdoc cref="_methods"/>
         public IReadOnlyList<MethodData> Methods => _methods.Value;
 
+        ///<inheritdoc cref="_constructors"/>
         public IReadOnlyCollection<ConstructorData> Constructors => _constructors.Value;
 
+        /// <summary>
+        /// Implicitly converts the specified <see cref="TypeData"/> to <see cref="Type"/>.
+        /// </summary>
+        /// <param name="typeData">Type data.</param>
+        /// <returns>Cached <see cref="Type"/>.</returns>
         public static implicit operator Type(TypeData typeData)
         {
             return typeData._type;
         }
 
+        /// <summary>
+        /// Does the left hand side <see cref="TypeData"/> contain any of the set bits from the specified right hand side <see cref="DefinitionFlags"/>?
+        /// </summary>
+        /// <param name="lhs">Left hand side <see cref="TypeData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="DefinitionFlags"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="TypeData"/> contains any of the set bits in the specified right hand side <see cref="DefinitionFlags"/>; otherwise, false.</returns>
         public static bool operator |(TypeData lhs, DefinitionFlags rhs)
         {
             return lhs != null && lhs._definitionFlags | rhs;
         }
 
+        /// <summary>
+        /// Does the left hand side <see cref="TypeData"/> contain all of the set bits from the specified right hand side <see cref="DefinitionFlags"/>?
+        /// </summary>
+        /// <param name="lhs">Left hand side <see cref="TypeData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="DefinitionFlags"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="TypeData"/> contains all of the set bits in the specified right hand side <see cref="DefinitionFlags"/>; otherwise, false.</returns>
         public static bool operator &(TypeData lhs, DefinitionFlags rhs)
         {
             return lhs != null && lhs._definitionFlags & rhs;
         }
 
+        /// <summary>
+        /// Is the current <see cref="TypeData"/> assignable to the specified <see cref="TypeData"/>?
+        /// </summary>
+        /// <param name="typeData">Type data.</param>
+        /// <returns>True if the current <see cref="TypeData"/> is assignable to the specified <see cref="TypeData"/>; otherwise, false.</returns>
         public bool IsAssignableTo(TypeData typeData)
         {
-            if (typeData == this)
-            {
-                return true;
-            }
-
-            if (typeData & DefinitionFlags.Class)
-            {
-                return Extends(typeData);
-            }
-
-            if (typeData & DefinitionFlags.Interface)
-            {
-                return Implements(typeData);
-            }
-
-            return false;
+            return typeData == this || Extends(typeData) || Implements(typeData);
         }
 
+        /// <summary>
+        /// Does the current <see cref="TypeData"/> extend the specified <see cref="TypeData"/>?
+        /// </summary>
+        /// <param name="baseTypeData">Base type data.</param>
+        /// <returns>True if the current <see cref="TypeData"/> extends the specified <see cref="TypeData"/>; otherwise, false.</returns>
         public bool Extends(TypeData baseTypeData)
         {
             if (!(baseTypeData & DefinitionFlags.Class))
             {
-                throw new ArgumentException($"{baseTypeData.Path} is not a class.");
+                return false;
             }
 
             var typeData = BaseType;
@@ -120,18 +180,36 @@ namespace Horizon.Reflection
             return false;
         }
 
+        /// <summary>
+        /// Does the current <see cref="TypeData"/> implement the specified <see cref="TypeData"/>?
+        /// </summary>
+        /// <param name="interfaceTypeData">Interface type data.</param>
+        /// <returns>True if the current <see cref="TypeData"/> implements the specified <see cref="TypeData"/>; otherwise, false.</returns>
         public bool Implements(TypeData interfaceTypeData)
         {
             if (!(interfaceTypeData & DefinitionFlags.Interface))
             {
-                throw new ArgumentException($"{interfaceTypeData.Path} is not an interface.");
+                return false;
             }
 
             return Interfaces.Any(typeData => typeData == interfaceTypeData);
         }
 
+        /// <summary>
+        /// Creates a new instance of the current <see cref="TypeData"/>.
+        /// </summary>
+        /// <param name="parameters">Constructor parameters.</param>
+        /// <param name="value">Value.</param>
+        /// <typeparam name="TValue">Type.</typeparam>
+        /// <returns>True if both a constructor was invoked and the output was cast successfully; otherwise, false.</returns>
         public bool TryCreate<TValue>(object[] parameters, out TValue value)
         {
+            if (this & ModifierFlags.Abstract || this & DefinitionFlags.Interface)
+            {
+                value = default;
+                return false;
+            }
+
             foreach (var constructorData in Constructors)
             {
                 if (!constructorData.TryInvoke(parameters, out TValue temp)) continue;

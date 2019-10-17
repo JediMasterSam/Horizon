@@ -5,12 +5,26 @@ using System.Reflection;
 
 namespace Horizon.Reflection
 {
+    /// <summary>
+    /// Represents a cached <see cref="ParameterInfo"/>.
+    /// </summary>
     public sealed class ParameterData : MemberData
     {
+        /// <summary>
+        /// Cached <see cref="ParameterInfo"/>.
+        /// </summary>
         private readonly ParameterInfo _parameterInfo;
 
+        /// <summary>
+        /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="ParameterData"/>.
+        /// </summary>
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ParameterData"/>.
+        /// </summary>
+        /// <param name="parameterInfo">Parameter info.</param>
+        /// <param name="declaringMethod">Declaring method.</param>
         internal ParameterData(ParameterInfo parameterInfo, MethodBaseData declaringMethod) : base(parameterInfo.Name, declaringMethod)
         {
             _parameterInfo = parameterInfo;
@@ -22,21 +36,45 @@ namespace Horizon.Reflection
             IsOptional = parameterInfo.IsOptional;
         }
         
+        ///<inheritdoc cref="_attributes"/>
         public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
 
+        /// <summary>
+        /// The declaring <see cref="MethodData"/> of the current <see cref="ParameterData"/>.
+        /// </summary>
         public MethodBaseData DeclaringMethod { get; }
 
+        /// <summary>
+        /// The <see cref="TypeData"/> of the current <see cref="ParameterData"/>.
+        /// </summary>
         public TypeData ParameterType { get; }
 
+        /// <summary>
+        /// Is the current <see cref="ParameterData"/> out?
+        /// </summary>
         public bool IsOut { get; }
 
+        /// <summary>
+        /// Is the current <see cref="ParameterData"/> optional?
+        /// </summary>
         public bool IsOptional { get; }
 
+        /// <summary>
+        /// Implicitly converts the specified <see cref="ParameterData"/> to <see cref="ParameterInfo"/>.
+        /// </summary>
+        /// <param name="parameterData">Parameter data.</param>
+        /// <returns>Cached <see cref="ParameterInfo"/>.</returns>
         public static implicit operator ParameterInfo(ParameterData parameterData)
         {
             return parameterData._parameterInfo;
         }
 
+        /// <summary>
+        /// Does the specified left hand side <see cref="ParameterData"/> equal the specified right hand side <see cref="ParameterData"/>?
+        /// </summary>
+        /// <param name="lhs">Left hand side <see cref="ParameterData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="ParameterData"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="ParameterData"/> equals the specified right hand side <see cref="ParameterData"/>; otherwise, false.</returns>
         public static bool operator ==(ParameterData lhs, ParameterData rhs)
         {
             if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null)) return true;
@@ -45,16 +83,24 @@ namespace Horizon.Reflection
             return lhs.Path == rhs.Path && lhs.ParameterType == rhs.ParameterType && lhs.IsOut == rhs.IsOut && lhs.IsOptional == rhs.IsOptional;
         }
 
+        /// <summary>
+        /// Does the specified left hand side <see cref="ParameterData"/> not equal the specified right hand side <see cref="ParameterData"/>?
+        /// </summary>
+        /// <param name="lhs">Left hand side <see cref="ParameterData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="ParameterData"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="ParameterData"/> does not equal the specified right hand side <see cref="ParameterData"/>; otherwise, false.</returns>
         public static bool operator !=(ParameterData lhs, ParameterData rhs)
         {
             return !(lhs == rhs);
         }
 
+        ///<inheritdoc/>
         public override bool Equals(object obj)
         {
             return obj is ParameterData parameterData && this == parameterData;
         }
 
+        ///<inheritdoc/>
         public override int GetHashCode()
         {
             unchecked

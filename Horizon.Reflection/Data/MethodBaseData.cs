@@ -16,7 +16,7 @@ namespace Horizon.Reflection
         private readonly MethodBase _methodBase;
 
         /// <summary>
-        /// Collection of every <see cref="Attribute"/> applied to the current <see cref="MethodBaseData"/>.
+        /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="MethodBaseData"/>.
         /// </summary>
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
