@@ -1,4 +1,7 @@
-﻿namespace Horizon.Reflection
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Horizon.Reflection
 {
     /// <summary>
     /// Represents the member information of a reflected value.
@@ -36,6 +39,11 @@
         /// The path to the current <see cref="MemberData"/>.
         /// </summary>
         public string Path { get; }
+        
+        /// <summary>
+        /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="MemberData"/>.
+        /// </summary>
+        public abstract IReadOnlyList<AttributeData> Attributes { get; }
 
         /// <summary>
         /// Does the specified left hand side <see cref="MemberData"/> equal the specified right hand side <see cref="MemberData"/>?
@@ -60,6 +68,52 @@
         public static bool operator !=(MemberData lhs, MemberData rhs)
         {
             return !(lhs == rhs);
+        }
+
+        /// <summary>
+        /// Gets all attributes applied to the current <see cref="MemberData"/> that are assignable from <see cref="TValue"/>.
+        /// </summary>
+        /// <typeparam name="TValue">Type.</typeparam>
+        /// <returns>Collection of attributes assignable from <see cref="TValue"/>.</returns>
+        public IEnumerable<TValue> GetAttributes<TValue>()
+        {
+            foreach (var attribute in Attributes)
+            {
+                if (attribute.TryGetValue<TValue>(out var value))
+                {
+                    yield return value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Does the current <see cref="MemberData"/> have an applied attribute assignable from <see cref="TValue"/>?
+        /// </summary>
+        /// <typeparam name="TValue">Type.</typeparam>
+        /// <returns>True if the current <see cref="MemberData"/> has an attribute assignable from <see cref="TValue"/>; otherwise, false.</returns>
+        public bool HasAttribute<TValue>()
+        {
+            return GetAttributes<TValue>().Any();
+        }
+
+        /// <summary>
+        /// Gets the first attribute applied to the current <see cref="MemberData"/> that is assignable from <see cref="TValue"/>.
+        /// </summary>
+        /// <param name="value">Attribute value.</param>
+        /// <typeparam name="TValue">Type.</typeparam>
+        /// <returns>True if there is an applied attribute to the current <see cref="MemberData"/> that is assignable from <see cref="TValue"/>; otherwise, false.</returns>
+        public bool TryGetAttribute<TValue>(out TValue value)
+        {
+            foreach (var attribute in Attributes)
+            {
+                if (attribute.TryGetValue(out value))
+                {
+                    return true;
+                }
+            }
+
+            value = default;
+            return false;
         }
 
         ///<inheritdoc/>

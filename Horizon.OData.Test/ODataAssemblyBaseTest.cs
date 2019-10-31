@@ -11,10 +11,10 @@ namespace Horizon.OData.Test
     {
         public ODataAssemblyBaseTest()
         {
-            ODataAssembly = new ODataAssembly(GetType().Assembly);
+            ApiData = new ApiData(GetType().Assembly);
         }
 
-        private ODataAssembly ODataAssembly { get; }
+        private ApiData ApiData { get; }
 
         [TestMethod]
         public void FindProfilesTest()
@@ -23,9 +23,9 @@ namespace Horizon.OData.Test
 
             void Test()
             {
-                if (AreEqual(1, ODataAssembly.Profiles.Count))
+                if (AreEqual(1, ApiData.Profiles.Count))
                 {
-                    AreEqual(typeof(AddressProfile), ODataAssembly.Profiles.First().GetType());
+                    AreEqual(typeof(AddressProfile), ApiData.Profiles.First().ProfileType);
                 }
             }
         }
@@ -37,9 +37,9 @@ namespace Horizon.OData.Test
             
             void Test()
             {
-                if (!AreEqual(2, ODataAssembly.Controllers.Count)) return;
+                if (!AreEqual(2, ApiData.Controllers.Count)) return;
                 
-                var types = ODataAssembly.Controllers.Select(controller => controller.GetTypeData()).ToArray();
+                var types = ApiData.Controllers.Select(controller => controller.GetTypeData()).ToArray();
 
                 Contains(types, typeof(Models.Controllers.V1.AddressController).GetTypeData());
                 Contains(types, typeof(Models.Controllers.V2.AddressController).GetTypeData());

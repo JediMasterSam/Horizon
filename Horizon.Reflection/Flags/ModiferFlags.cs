@@ -36,7 +36,7 @@ namespace Horizon.Reflection
         /// <summary>
         /// The implementation belongs to an object.
         /// </summary>
-        Instance = 32 | Abstract,
+        Instance = 32,
 
         /// <summary>
         /// The implementation belongs to the type. 

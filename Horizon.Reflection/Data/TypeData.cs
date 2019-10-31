@@ -19,7 +19,7 @@ namespace Horizon.Reflection
         /// The <see cref="DefinitionFlags"/> for the current <see cref="TypeData"/>.
         /// </summary>
         private readonly BitField<DefinitionFlags> _definitionFlags;
-
+        
         /// <summary>
         /// The declaring <see cref="AssemblyData"/> of the current <see cref="TypeData"/>.
         /// </summary>
@@ -39,6 +39,11 @@ namespace Horizon.Reflection
         /// Collection of every <see cref="TypeData"/> that the current <see cref="TypeData"/> implements.
         /// </summary>
         private readonly Lazy<IReadOnlyList<TypeData>> _interfaces;
+
+        /// <summary>
+        /// Collection of every <see cref="GenericArgumentData"/> that the current <see cref="TypeData"/> defines.
+        /// </summary>
+        private readonly Lazy<IReadOnlyList<GenericArgumentData>> _genericArguments;
 
         /// <summary>
         /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="TypeData"/>.
@@ -66,6 +71,11 @@ namespace Horizon.Reflection
         private readonly Lazy<IReadOnlyList<ConstructorData>> _constructors;
 
         /// <summary>
+        /// The XML summary given to the current <see cref="TypeData"/>.
+        /// </summary>
+        private readonly Lazy<string> _description;
+
+        /// <summary>
         /// Creates a new instance of <see cref="TypeData"/>.
         /// </summary>
         /// <param name="type">Type.</param>
@@ -77,11 +87,13 @@ namespace Horizon.Reflection
             _baseType = new Lazy<TypeData>(() => _type.BaseType.GetTypeData());
             _declaringType = new Lazy<TypeData>(() => _type.DeclaringType.GetTypeData());
             _interfaces = new Lazy<IReadOnlyList<TypeData>>(() => _type.GetInterfaces().Select(interfaceType => interfaceType.GetTypeData()).ToArray());
-            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _type.GetCustomAttributes(false).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _genericArguments = new Lazy<IReadOnlyList<GenericArgumentData>>(() => _type.GetGenericArguments().Select(genericArgumentType => new GenericArgumentData(genericArgumentType, this)).ToArray());
+            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _type.GetCustomAttributes(true).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
             _fields = new Lazy<IReadOnlyList<FieldData>>(() => FieldDataFactory.Instance.Get(this));
             _properties = new Lazy<IReadOnlyList<PropertyData>>(() => PropertyDataFactory.Instance.Get(this));
             _methods = new Lazy<IReadOnlyList<MethodData>>(() => MethodDataFactory.Instance.Get(this));
             _constructors = new Lazy<IReadOnlyList<ConstructorData>>(() => ConstructorDataFactory.Instance.Get(this));
+            _description = new Lazy<string>(() => Assembly.XmlDocumentation.GetSummary(this));
         }
 
         ///<inheritdoc cref="_assembly"/>
@@ -96,8 +108,11 @@ namespace Horizon.Reflection
         ///<inheritdoc cref="_interfaces"/>
         public IReadOnlyList<TypeData> Interfaces => _interfaces.Value;
 
+        ///<inheritdoc cref="_genericArguments"/>
+        public IReadOnlyList<GenericArgumentData> GenericArguments => _genericArguments.Value;
+
         ///<inheritdoc cref="_attributes"/>
-        public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+        public override IReadOnlyList<AttributeData> Attributes => _attributes.Value;
 
         ///<inheritdoc cref="_fields"/>
         public IReadOnlyList<FieldData> Fields => _fields.Value;
@@ -110,6 +125,9 @@ namespace Horizon.Reflection
 
         ///<inheritdoc cref="_constructors"/>
         public IReadOnlyCollection<ConstructorData> Constructors => _constructors.Value;
+
+        ///<inheritdoc cref="_description"/>
+        public string Description => _description.Value;
 
         /// <summary>
         /// Implicitly converts the specified <see cref="TypeData"/> to <see cref="Type"/>.
@@ -204,8 +222,20 @@ namespace Horizon.Reflection
         /// <returns>True if both a constructor was invoked and the output was cast successfully; otherwise, false.</returns>
         public bool TryCreate<TValue>(object[] parameters, out TValue value)
         {
-            if (this & ModifierFlags.Abstract || this & DefinitionFlags.Interface)
+            if (this & ModifierFlags.Abstract || this | (DefinitionFlags.Interface | DefinitionFlags.DeconstructedGeneric))
             {
+                value = default;
+                return false;
+            }
+
+            if (Constructors.Count == 0)
+            {
+                if (parameters == null)
+                {
+                    value = Activator.CreateInstance<TValue>();
+                    return true;
+                }
+
                 value = default;
                 return false;
             }
@@ -219,6 +249,32 @@ namespace Horizon.Reflection
 
             value = default;
             return false;
+        }
+
+        /// <summary>
+        /// Constructs a generic type out of the current <see cref="TypeData"/>.
+        /// </summary>
+        /// <param name="typeArguments">Type arguments.</param>
+        /// <param name="genericType">Generic type.</param>
+        /// <returns>True if a generic type was successfully created; otherwise, false.</returns>
+        public bool TryMakeGenericType(Type[] typeArguments, out TypeData genericType)
+        {
+            if (!(this & DefinitionFlags.DeconstructedGeneric))
+            {
+                genericType = null;
+                return false;
+            }
+
+            try
+            {
+                genericType = _type.MakeGenericType(typeArguments).GetTypeData();
+                return true;
+            }
+            catch (Exception)
+            {
+                genericType = null;
+                return false;
+            }
         }
     }
 }

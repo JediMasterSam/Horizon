@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Horizon.Reflection
 {
@@ -35,6 +36,11 @@ namespace Horizon.Reflection
         /// The type of the current <see cref="AttributeData"/>.
         /// </summary>
         public TypeData Type { get; }
+
+        /// <summary>
+        /// Collection of every <see cref="AttributeData"/> applied to the current <see cref="AttributeData"/>.
+        /// </summary>
+        public override IReadOnlyList<AttributeData> Attributes => Type.Attributes;
 
         /// <summary>
         /// Gets the cached <see cref="Attribute"/> as the specified <see cref="TValue"/>.

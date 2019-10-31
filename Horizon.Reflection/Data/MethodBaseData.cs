@@ -21,6 +21,11 @@ namespace Horizon.Reflection
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
         /// <summary>
+        /// The XML summary given to the current <see cref="TypeData"/>.
+        /// </summary>
+        private readonly Lazy<string> _description;
+
+        /// <summary>
         /// Creates a new instance of <see cref="MethodBaseData"/>.
         /// </summary>
         /// <param name="methodBase">Method base.</param>
@@ -28,14 +33,18 @@ namespace Horizon.Reflection
         protected internal MethodBaseData(MethodBase methodBase, TypeData declaringType) : base(methodBase.GetModifierFlags(), methodBase.Name, declaringType)
         {
             _methodBase = methodBase;
-            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _methodBase.GetCustomAttributes(false).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _methodBase.GetCustomAttributes(true).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _description = new Lazy<string>(() => DeclaringType.Assembly.XmlDocumentation.GetSummary(this));
 
             DeclaringType = declaringType;
             Parameters = methodBase.GetParameters().Select(parameterInfo => new ParameterData(parameterInfo, this)).ToArray();
         }
 
         ///<inheritdoc cref="_attributes"/>
-        public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+        public override IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+        
+        ///<inheritdoc cref="_description"/>
+        public string Description => _description.Value;
 
         /// <summary>
         /// The declaring <see cref="TypeData"/> of the current <see cref="MethodBaseData"/>.

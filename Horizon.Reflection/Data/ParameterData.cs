@@ -21,6 +21,16 @@ namespace Horizon.Reflection
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
         /// <summary>
+        /// The default value of the current <see cref="ParameterData"/>.
+        /// </summary>
+        private readonly Lazy<object> _defaultValue;
+
+        /// <summary>
+        /// The XML summary given to the current <see cref="TypeData"/>.
+        /// </summary>
+        private readonly Lazy<string> _description;
+
+        /// <summary>
         /// Creates a new instance of <see cref="ParameterData"/>.
         /// </summary>
         /// <param name="parameterInfo">Parameter info.</param>
@@ -28,16 +38,24 @@ namespace Horizon.Reflection
         internal ParameterData(ParameterInfo parameterInfo, MethodBaseData declaringMethod) : base(parameterInfo.Name, declaringMethod)
         {
             _parameterInfo = parameterInfo;
-            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _parameterInfo.GetCustomAttributes(false).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _parameterInfo.GetCustomAttributes(true).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _defaultValue = new Lazy<object>(() => _parameterInfo.DefaultValue);
+            _description = new Lazy<string>(() => DeclaringMethod.DeclaringType.Assembly.XmlDocumentation.GetSummary(this));
 
             DeclaringMethod = declaringMethod;
             ParameterType = parameterInfo.ParameterType.GetTypeData();
             IsOut = parameterInfo.IsOut;
             IsOptional = parameterInfo.IsOptional;
         }
-        
+
         ///<inheritdoc cref="_attributes"/>
-        public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+        public override IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+
+        ///<inheritdoc cref="_defaultValue"/>
+        public object DefaultValue => _defaultValue.Value;
+
+        ///<inheritdoc cref="_description"/>
+        public string Description => _description.Value;
 
         /// <summary>
         /// The declaring <see cref="MethodData"/> of the current <see cref="ParameterData"/>.

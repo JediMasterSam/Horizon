@@ -21,6 +21,11 @@ namespace Horizon.Reflection
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
         /// <summary>
+        /// The XML summary given to the current <see cref="TypeData"/>.
+        /// </summary>
+        private readonly Lazy<string> _description;
+
+        /// <summary>
         /// Creates a new instance of <see cref="FieldData"/>.
         /// </summary>
         /// <param name="fieldInfo">Field info.</param>
@@ -28,14 +33,18 @@ namespace Horizon.Reflection
         internal FieldData(FieldInfo fieldInfo, TypeData declaringType) : base(fieldInfo.GetModifierFlags(), fieldInfo.Name, declaringType)
         {
             _fieldInfo = fieldInfo;
-            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _fieldInfo.GetCustomAttributes(false).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
-
+            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _fieldInfo.GetCustomAttributes(true).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _description = new Lazy<string>(() => DeclaringType.Assembly.XmlDocumentation.GetSummary(this));
+            
             DeclaringType = declaringType;
             FieldType = fieldInfo.FieldType.GetTypeData();
         }
 
         ///<inheritdoc cref="_attributes"/>
-        public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+        public override IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+
+        ///<inheritdoc cref="_description"/>
+        public string Description => _description.Value;
 
         /// <summary>
         /// The declaring <see cref="TypeData"/> of the current <see cref="FieldData"/>.

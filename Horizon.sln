@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Horizon.OData.Test", "Horiz
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Horizon.Collections", "Horizon.Collections\Horizon.Collections.csproj", "{48F185A6-A029-4A03-847C-79D21C96D8BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{AB3E2178-B5CD-42F7-B6F1-6B7AAAEF63BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48F185A6-A029-4A03-847C-79D21C96D8BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3E2178-B5CD-42F7-B6F1-6B7AAAEF63BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3E2178-B5CD-42F7-B6F1-6B7AAAEF63BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3E2178-B5CD-42F7-B6F1-6B7AAAEF63BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3E2178-B5CD-42F7-B6F1-6B7AAAEF63BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C0C001A3-7197-4D39-9914-BF20B1360773} = {FF35E70C-16D6-4A69-89C4-613CE319980F}

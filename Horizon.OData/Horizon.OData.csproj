@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,6 +11,12 @@
 
     <ItemGroup>
       <None Remove="Horizon.OData.csproj.DotSettings" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+      <PackageReference Include="Microsoft.AspNetCore.OData.Versioning" Version="3.2.4" />
+      <PackageReference Include="Microsoft.AspNetCore.OData.Versioning.ApiExplorer" Version="3.2.3" />
     </ItemGroup>
 
 </Project>

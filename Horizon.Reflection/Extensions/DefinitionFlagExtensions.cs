@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Horizon.Numerics;
 
 namespace Horizon.Reflection
@@ -7,17 +8,45 @@ namespace Horizon.Reflection
     {
         internal static BitField<DefinitionFlags> GetDefinitionFlags(this Type type)
         {
+            DefinitionFlags definitionFlags;
+
             if (type.IsClass)
             {
-                return DefinitionFlags.Class;
+                definitionFlags = DefinitionFlags.Class;
             }
-
-            if (type.IsInterface)
+            else if (type.IsInterface)
             {
-                return DefinitionFlags.Interface;
+                definitionFlags = DefinitionFlags.Interface;
+            }
+            else if (type.IsPrimitive)
+            {
+                definitionFlags = DefinitionFlags.Primitive;
+            }
+            else
+            {
+                definitionFlags = DefinitionFlags.Value;
             }
 
-            return type.IsPrimitive ? DefinitionFlags.Primitive : DefinitionFlags.Value;
+            if (type.IsConstructedGenericType)
+            {
+                definitionFlags |= DefinitionFlags.ConstructedGeneric;
+            }
+            else if (type.IsGenericTypeDefinition)
+            {
+                definitionFlags |= DefinitionFlags.DeconstructedGeneric;
+            }
+
+            return definitionFlags;
+        }
+
+        internal static DefinitionFlags GetDefinitionFlags(this MethodInfo methodInfo)
+        {
+            if (!methodInfo.IsGenericMethod)
+            {
+                return 0;
+            }
+
+            return methodInfo.IsConstructedGenericMethod ? DefinitionFlags.ConstructedGeneric : DefinitionFlags.DeconstructedGeneric;
         }
     }
 }

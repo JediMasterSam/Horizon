@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Horizon.Numerics;
 
 namespace Horizon.Reflection
 {
@@ -14,6 +17,16 @@ namespace Horizon.Reflection
         private readonly MethodInfo _methodInfo;
 
         /// <summary>
+        /// The <see cref="DefinitionFlags"/> for the current <see cref="MethodData"/>.
+        /// </summary>
+        private readonly BitField<DefinitionFlags> _definitionFlags;
+
+        /// <summary>
+        /// Collection of every <see cref="GenericArgumentData"/> that the current <see cref="MethodData"/> defines.
+        /// </summary>
+        private readonly Lazy<IReadOnlyList<GenericArgumentData>> _genericArguments;
+
+        /// <summary>
         /// Creates a new instance of <see cref="MethodData"/>.
         /// </summary>
         /// <param name="methodInfo">Method info.</param>
@@ -21,6 +34,8 @@ namespace Horizon.Reflection
         internal MethodData(MethodInfo methodInfo, TypeData declaringType) : base(methodInfo, declaringType)
         {
             _methodInfo = methodInfo;
+            _definitionFlags = methodInfo.GetDefinitionFlags();
+            _genericArguments = new Lazy<IReadOnlyList<GenericArgumentData>>(() => _methodInfo.GetGenericArguments().Select(genericArgumentType => new GenericArgumentData(genericArgumentType, this)).ToArray());
 
             ReturnType = methodInfo.ReturnType.GetTypeData();
             IsVoid = ReturnType == typeof(void).GetTypeData();
@@ -30,6 +45,9 @@ namespace Horizon.Reflection
         /// The return <see cref="TypeData"/> of the current <see cref="MethodData"/>.
         /// </summary>
         public TypeData ReturnType { get; }
+
+        ///<inheritdoc cref="_genericArguments"/>
+        public IReadOnlyList<GenericArgumentData> GenericArguments => _genericArguments.Value;
 
         /// <summary>
         /// Is the <see cref="ReturnType"/> equal to <see cref="Void"/>?
@@ -72,6 +90,28 @@ namespace Horizon.Reflection
         }
 
         /// <summary>
+        /// Does the left hand side <see cref="MethodData"/> contain any of the set bits from the specified right hand side <see cref="DefinitionFlags"/>?
+        /// </summary>
+        /// <param name="lhs">Left hand side <see cref="MethodData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="DefinitionFlags"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="MethodData"/> contains any of the set bits in the specified right hand side <see cref="DefinitionFlags"/>; otherwise, false.</returns>
+        public static bool operator |(MethodData lhs, DefinitionFlags rhs)
+        {
+            return lhs != null && lhs._definitionFlags | rhs;
+        }
+
+        /// <summary>
+        /// Does the left hand side <see cref="MethodData"/> contain all of the set bits from the specified right hand side <see cref="DefinitionFlags"/>?
+        /// </summary>
+        /// <param name="lhs">Left hand side <see cref="MethodData"/>.</param>
+        /// <param name="rhs">Right hand side <see cref="DefinitionFlags"/>.</param>
+        /// <returns>True if the specified left hand side <see cref="MethodData"/> contains all of the set bits in the specified right hand side <see cref="DefinitionFlags"/>; otherwise, false.</returns>
+        public static bool operator &(MethodData lhs, DefinitionFlags rhs)
+        {
+            return lhs != null && lhs._definitionFlags & rhs;
+        }
+
+        /// <summary>
         /// Invokes the cached <see cref="MethodInfo"/> in the current <see cref="MethodData"/> with the specified parameters on the specified object.
         /// </summary>
         /// <param name="obj">The object on which to invoke the method.</param>
@@ -79,6 +119,11 @@ namespace Horizon.Reflection
         /// <returns>True if the method was invoked successfully; otherwise, false.</returns>
         public bool TryInvoke(object obj, object[] parameters)
         {
+            if (this & DefinitionFlags.DeconstructedGeneric)
+            {
+                return false;
+            }
+
             try
             {
                 _methodInfo.Invoke(obj, parameters);
@@ -100,6 +145,12 @@ namespace Horizon.Reflection
         /// <returns>True if both the method was invoked and the output was cast successfully; otherwise, false.</returns>
         public bool TryInvoke<TValue>(object obj, object[] parameters, out TValue value)
         {
+            if (this & DefinitionFlags.DeconstructedGeneric)
+            {
+                value = default;
+                return false;
+            }
+
             try
             {
                 if (!IsVoid && _methodInfo.Invoke(obj, parameters) is TValue temp)
@@ -118,6 +169,32 @@ namespace Horizon.Reflection
             }
         }
 
+        /// <summary>
+        /// Constructs a generic method out of the current <see cref="MethodData"/>.
+        /// </summary>
+        /// <param name="typeArguments">Type arguments.</param>
+        /// <param name="genericMethod">Generic method.</param>
+        /// <returns>True if a generic method was successfully created; otherwise, false.</returns>
+        public bool TryMakeGenericMethod(Type[] typeArguments, out MethodData genericMethod)
+        {
+            if (!(this & DefinitionFlags.DeconstructedGeneric))
+            {
+                genericMethod = null;
+                return false;
+            }
+
+            try
+            {
+                genericMethod = new MethodData(_methodInfo.MakeGenericMethod(typeArguments), DeclaringType);
+                return true;
+            }
+            catch (Exception)
+            {
+                genericMethod = null;
+                return false;
+            }
+        }
+        
         ///<inheritdoc/>
         public override bool Equals(object obj)
         {

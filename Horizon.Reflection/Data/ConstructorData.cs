@@ -21,7 +21,14 @@ namespace Horizon.Reflection
         internal ConstructorData(ConstructorInfo constructorInfo, TypeData declaringType) : base(constructorInfo, declaringType)
         {
             _constructorInfo = constructorInfo;
+
+            IsDefault = Parameters.Count == 0;
         }
+
+        /// <summary>
+        /// Is the current <see cref="ConstructorData"/> parameterless?
+        /// </summary>
+        public bool IsDefault { get; }
 
         /// <summary>
         /// Implicitly converts the specified <see cref="ConstructorData"/> to <see cref="ConstructorInfo"/>.
@@ -97,7 +104,6 @@ namespace Horizon.Reflection
             unchecked
             {
                 var hashCode = Path.GetHashCode();
-                hashCode = (hashCode * 397) ^ (Parameters != null ? Parameters.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Parameters != null ? Parameters.GetHashCode() : 0);
                 return hashCode;
             }

@@ -21,6 +21,11 @@ namespace Horizon.Reflection
         private readonly Lazy<IReadOnlyList<AttributeData>> _attributes;
 
         /// <summary>
+        /// The XML summary given to the current <see cref="TypeData"/>.
+        /// </summary>
+        private readonly Lazy<string> _description;
+
+        /// <summary>
         /// Creates a new instance of <see cref="PropertyData"/>.
         /// </summary>
         /// <param name="propertyInfo">Property info.</param>
@@ -28,7 +33,8 @@ namespace Horizon.Reflection
         internal PropertyData(PropertyInfo propertyInfo, TypeData declaringType) : base(propertyInfo.Name, declaringType)
         {
             _propertyInfo = propertyInfo;
-            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _propertyInfo.GetCustomAttributes(false).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _propertyInfo.GetCustomAttributes(true).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
+            _description = new Lazy<string>(() => DeclaringType.Assembly.XmlDocumentation.GetSummary(this));
 
             DeclaringType = declaringType;
             PropertyType = propertyInfo.PropertyType.GetTypeData();
@@ -36,9 +42,12 @@ namespace Horizon.Reflection
             Get = propertyInfo.CanRead ? new MethodData(propertyInfo.GetMethod, declaringType) : null;
             Set = propertyInfo.CanWrite ? new MethodData(propertyInfo.SetMethod, declaringType) : null;
         }
-        
+
         ///<inheritdoc cref="_attributes"/>
-        public IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+        public override IReadOnlyList<AttributeData> Attributes => _attributes.Value;
+
+        ///<inheritdoc cref="_description"/>
+        public string Description => _description.Value;
 
         /// <summary>
         /// The declaring <see cref="TypeData"/> of the current <see cref="PropertyData"/>.
@@ -69,7 +78,7 @@ namespace Horizon.Reflection
         {
             return propertyData._propertyInfo;
         }
-        
+
         /// <summary>
         /// Does the specified left hand side <see cref="PropertyData"/> equal the specified right hand side <see cref="PropertyData"/>?
         /// </summary>
@@ -108,7 +117,7 @@ namespace Horizon.Reflection
             {
                 return Get.TryInvoke(obj, null, out value);
             }
-            
+
             value = default;
             return false;
         }
