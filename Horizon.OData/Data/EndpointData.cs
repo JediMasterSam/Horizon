@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using Horizon.OData.Attributes;
 using Horizon.Reflection;
 
 namespace Horizon.OData
@@ -10,9 +12,15 @@ namespace Horizon.OData
     {
         private readonly Lazy<IReadOnlyList<IParameter>> _headers;
 
+        private readonly Lazy<IReadOnlyList<HttpStatusCode>> _statusCodes;
+
+        private readonly Lazy<TypeData> _responseType;
+
         internal EndpointData(MethodData method, HttpMethod httpMethod, ControllerData controller, bool deprecated)
         {
             _headers = new Lazy<IReadOnlyList<IParameter>>(() => GetHeaders(Method, Controller).ToArray());
+            _statusCodes = new Lazy<IReadOnlyList<HttpStatusCode>>(() => GetStatusCodes(Method).ToArray());
+            _responseType = new Lazy<TypeData>(() => GetResponseType(Method));
 
             Method = method;
             HttpMethod = httpMethod;
@@ -29,6 +37,10 @@ namespace Horizon.OData
         public bool Deprecated { get; }
 
         public IReadOnlyList<IParameter> Headers => _headers.Value;
+
+        public IReadOnlyList<HttpStatusCode> StatusCodes => _statusCodes.Value;
+
+        public TypeData ResponseType => _responseType.Value;
 
         private static IEnumerable<IParameter> GetHeaders(MethodBaseData method, ControllerData controller)
         {
@@ -59,6 +71,46 @@ namespace Horizon.OData
 
                 yield return header;
             }
+        }
+
+        private static IEnumerable<HttpStatusCode> GetStatusCodes(MethodBaseData method)
+        {
+            var found = false;
+
+            foreach (var instruction in method.Instructions)
+            {
+                if (!instruction.TryGetMethod(out var calledMethod)) continue;
+                if (!calledMethod.TryGetAttribute<StatusCodeAttribute>(out var value)) continue;
+
+                found = true;
+                yield return value.StatusCode;
+            }
+
+            if (!found)
+            {
+                throw new EndpointException($"No HTTP status codes were found.", method);
+            }
+        }
+
+        private static TypeData GetResponseType(MethodBaseData method)
+        {
+            var response = typeof(IResponse).GetTypeData();
+            TypeData responseType = null;
+
+            foreach (var instruction in method.Instructions)
+            {
+                if (instruction.TryGetMethod(out var calledMethod) && calledMethod is ConstructorData && calledMethod.DeclaringType.Implements(response))
+                {
+                    if (responseType != null)
+                    {
+                        throw new EndpointException($"{responseType.Path} and {calledMethod.DeclaringType.Path} both implement {response.Path}.", method);
+                    }
+
+                    responseType = calledMethod.DeclaringType;
+                }
+            }
+
+            return responseType;
         }
     }
 }

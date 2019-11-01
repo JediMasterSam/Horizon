@@ -25,6 +25,8 @@ namespace Horizon.Reflection
         /// </summary>
         private readonly Lazy<string> _description;
 
+        private readonly Lazy<IReadOnlyList<Instruction>> _instructions;
+
         /// <summary>
         /// Creates a new instance of <see cref="MethodBaseData"/>.
         /// </summary>
@@ -35,6 +37,7 @@ namespace Horizon.Reflection
             _methodBase = methodBase;
             _attributes = new Lazy<IReadOnlyList<AttributeData>>(() => _methodBase.GetCustomAttributes(true).Select(value => new AttributeData(value, value.GetType(), this)).ToArray());
             _description = new Lazy<string>(() => DeclaringType.Assembly.XmlDocumentation.GetSummary(this));
+            _instructions = new Lazy<IReadOnlyList<Instruction>>(() => InstructionReader.GetInstructions(this));
 
             DeclaringType = declaringType;
             Parameters = methodBase.GetParameters().Select(parameterInfo => new ParameterData(parameterInfo, this)).ToArray();
@@ -55,6 +58,8 @@ namespace Horizon.Reflection
         /// Collection of every <see cref="ParameterInfo"/> declared in the current <see cref="MethodBaseData"/>.
         /// </summary>
         public IReadOnlyList<ParameterData> Parameters { get; }
+
+        public IReadOnlyList<Instruction> Instructions => _instructions.Value;
 
         /// <summary>
         /// Implicitly converts the specified <see cref="MethodBaseData"/> to <see cref="MethodBase"/>.

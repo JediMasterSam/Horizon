@@ -19,7 +19,7 @@ namespace Horizon.Reflection
         /// The <see cref="DefinitionFlags"/> for the current <see cref="TypeData"/>.
         /// </summary>
         private readonly BitField<DefinitionFlags> _definitionFlags;
-        
+
         /// <summary>
         /// The declaring <see cref="AssemblyData"/> of the current <see cref="TypeData"/>.
         /// </summary>
@@ -276,5 +276,18 @@ namespace Horizon.Reflection
                 return false;
             }
         }
+
+//        public bool TryGetMethod(MethodBaseDataQuery query, out MethodBaseData method)
+//        {
+//            method = query.Name == ".ctor" ? Select(Constructors) : Select(Methods);
+//
+//            return method != null;
+//
+//            MethodBaseData Select<TMethodBaseData>(IEnumerable<TMethodBaseData> methods) where TMethodBaseData : MethodBaseData
+//            {
+//                return methods.Where(methodData => methodData.Name == query.Name && methodData.Parameters.Count == query.Parameters.Count)
+//                    .FirstOrDefault(methodData => !methodData.Parameters.Where((parameter, index) => parameter.ParameterType != query.Parameters[index]).Any());
+//            }
+//        }
     }
 }

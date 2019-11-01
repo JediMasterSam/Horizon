@@ -64,7 +64,6 @@ namespace Horizon.Reflection
         protected override bool AreEquivalent(MethodData lhs, MethodData rhs)
         {
             return lhs.Name == rhs.Name &&
-                   lhs.ReturnType == rhs.ReturnType &&
                    lhs.Parameters.Count == rhs.Parameters.Count &&
                    !lhs.Parameters.Where((parameterData, index) => parameterData.ParameterType != rhs.Parameters[index].ParameterType).Any();
         }
