@@ -3,7 +3,7 @@
 namespace Horizon.OData.Attributes
 {
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-    public sealed class HeaderAttribute : Attribute, IHeader
+    public sealed class HeaderAttribute : Attribute
     {
         public HeaderAttribute(string name)
         {
@@ -15,23 +15,14 @@ namespace Horizon.OData.Attributes
         {
             Name = name;
             DefaultValue = defaultValue;
-            Required = false;
+            Required = !string.IsNullOrEmpty(defaultValue);
         }
 
         public string Name { get; }
 
-        public string DefaultValue { get; private set; }
+        public string DefaultValue { get; }
 
-        public bool Required { get; private set; }
+        public bool Required { get; }
 
-        void IHeader.SetRequired(bool required)
-        {
-            Required = required;
-        }
-
-        void IHeader.SetDefaultValue(string defaultValue)
-        {
-            DefaultValue = defaultValue;
-        }
     }
 }

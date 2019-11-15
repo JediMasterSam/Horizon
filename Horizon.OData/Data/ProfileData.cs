@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using Horizon.OData.Factories;
 using Horizon.Reflection;
 
 namespace Horizon.OData
 {
     public sealed class ProfileData
     {
-        private readonly Lazy<string> _routeName;
+        private readonly Lazy<string> _name;
         
         private readonly List<ControllerData> _controllers;
 
         internal ProfileData(IProfile profile, ApiData apiData)
         {
-            _routeName = new Lazy<string>(() => GetRouteName(ProfileType));
+            _name = new Lazy<string>(() => NameFactory.GetProfileName(this));
             _controllers = new List<ControllerData>();
 
             ProfileType = profile.GetTypeData();
@@ -26,7 +27,7 @@ namespace Horizon.OData
 
         public ApiData ApiData { get; }
 
-        public string RouteName => _routeName.Value;
+        public string Name => _name.Value;
 
         public IReadOnlyList<ControllerData> Controllers => _controllers;
 
@@ -38,18 +39,6 @@ namespace Horizon.OData
             controller.Profile = this;
 
             return true;
-        }
-
-        private static string GetRouteName(MemberData profileType)
-        {
-            const string suffix = "Profile";
-
-            if (profileType.Name.EndsWith(suffix))
-            {
-                return profileType.Name.Substring(0, profileType.Name.Length - suffix.Length);
-            }
-
-            throw new ProfileException($"The name '{profileType.Name}' does have the suffix '{suffix}'.", profileType);
         }
     }
 }

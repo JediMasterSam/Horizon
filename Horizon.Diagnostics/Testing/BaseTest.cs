@@ -227,6 +227,16 @@ namespace Horizon.Diagnostics
             return Assertion.SequenceEquals(expected, actual, _stackTraceTracker).Aggregate(true, (passed, assertion) => passed && _assertionLog.Add(assertion));
         }
 
+        protected bool IsEmpty<T>(IEnumerable<T> enumerable)
+        {
+            return Assertion.IsEmpty(enumerable, _stackTraceTracker);
+        }
+
+        protected bool IsNotEmpty<T>(IEnumerable<T> enumerable)
+        {
+            return Assertion.IsNotEmpty(enumerable, _stackTraceTracker);
+        }
+
         /// <summary>
         /// Sets the expected <see cref="Exception"/>.
         /// </summary>

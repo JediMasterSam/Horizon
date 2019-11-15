@@ -4,7 +4,20 @@ namespace Horizon.Reflection.Test.Models
 {
     public class Methods : MethodsBase
     {
+        public MethodInfo Declared { get; }
+
+        public Methods()
+        {
+            Declared = typeof(Methods).GetMethod(nameof(DeclaredMethod), BindingFlags.Instance | BindingFlags.Public);
+        }
+
         public override void AbstractMethod()
+        {
+        }
+
+        // ReSharper disable once MemberCanBeMadeStatic.Global
+        // ReSharper disable once MemberCanBePrivate.Global
+        public void DeclaredMethod()
         {
         }
     }
@@ -25,8 +38,6 @@ namespace Horizon.Reflection.Test.Models
 
         public MethodInfo Static { get; }
 
-        public MethodInfo Instance { get; }
-
         protected MethodsBase()
         {
             Public = typeof(MethodsBase).GetMethod(nameof(PublicMethod), BindingFlags.Instance | BindingFlags.Public);
@@ -36,7 +47,6 @@ namespace Horizon.Reflection.Test.Models
             Private = typeof(MethodsBase).GetMethod(nameof(PrivateMethod), BindingFlags.Instance | BindingFlags.NonPublic);
             Abstract = typeof(MethodsBase).GetMethod(nameof(AbstractMethod), BindingFlags.Instance | BindingFlags.Public);
             Static = typeof(MethodsBase).GetMethod(nameof(StaticMethod), BindingFlags.Static | BindingFlags.Public);
-            Instance = typeof(MethodsBase).GetMethod(nameof(PublicMethod), BindingFlags.Instance | BindingFlags.Public);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global

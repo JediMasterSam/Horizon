@@ -267,6 +267,20 @@ namespace Horizon.Diagnostics
             }
         }
 
+        internal static Assertion IsEmpty<T>(IEnumerable<T> enumerable, StackTraceTracker stackTraceTracker)
+        {
+            return enumerable.Any()
+                ? new Assertion(false, "Expected no elements but found elements.", nameof(IsEmpty), stackTraceTracker)
+                : new Assertion(true, "Expected no elements and found no elements.", nameof(IsEmpty), stackTraceTracker);
+        }
+        
+        internal static Assertion IsNotEmpty<T>(IEnumerable<T> enumerable, StackTraceTracker stackTraceTracker)
+        {
+            return enumerable.Any()
+                ? new Assertion(true, "Expected elements and found elements.", nameof(IsNotEmpty), stackTraceTracker)
+                : new Assertion(false, "Expected elements but found no elements.", nameof(IsNotEmpty), stackTraceTracker);
+        }
+
         /// <summary>
         /// Does the specified expected value equal the specified actual value?
         /// </summary>

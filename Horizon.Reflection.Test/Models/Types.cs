@@ -19,9 +19,7 @@ namespace Horizon.Reflection.Test.Models
         public Type PrivateNested { get; }
 
         public Type Abstract { get; }
-
-        public Type Instance { get; }
-
+        
         public Type Static { get; }
 
         public Types()
@@ -34,7 +32,6 @@ namespace Horizon.Reflection.Test.Models
             ProtectedInternalNested = typeof(ProtectedInternalNestedType);
             PrivateNested = typeof(PrivateNestedType);
             Abstract = typeof(Abstract);
-            Instance = GetType();
             Static = typeof(Static);
         }
 

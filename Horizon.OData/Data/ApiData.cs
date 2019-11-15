@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using Horizon.OData.Attributes;
+using Horizon.OData.Factories;
 using Horizon.Reflection;
+using Microsoft.AspNet.OData;
 
 namespace Horizon.OData
 {
@@ -14,7 +16,7 @@ namespace Horizon.OData
             var controllers = new List<ControllerData>();
 
             var profileTypeData = typeof(IProfile).GetTypeData();
-            var controllerTypeData = typeof(IController).GetTypeData();
+            var odataControllerType = typeof(ODataController).GetTypeData();
 
             var assemblyData = assembly.GetAssemblyData();
 
@@ -29,7 +31,7 @@ namespace Horizon.OData
                         profiles.Add(new ProfileData(profile, this));
                     }
                 }
-                else if (typeData.Implements(controllerTypeData) && (!typeData.TryGetAttribute<DeprecatedAttribute>(out var deprecated) || !deprecated.Hide))
+                else if (typeData.IsAssignableTo(odataControllerType) && (!typeData.TryGetAttribute<DeprecatedAttribute>(out var deprecated) || !deprecated.Hide))
                 {
                     controllers.Add(new ControllerData(typeData, this, deprecated != null));
                 }
@@ -50,13 +52,13 @@ namespace Horizon.OData
 
             Profiles = profiles;
             Controllers = controllers;
-            Headers = assemblyData.GetAttributes<IHeader>().ToArray();
+            Headers = HeaderFactory.GetAssemblyHeaders(assemblyData);
         }
 
         public IReadOnlyList<ProfileData> Profiles { get; }
 
         public IReadOnlyList<ControllerData> Controllers { get; }
         
-        public IReadOnlyList<IParameter> Headers { get; }
+        public IReadOnlyList<RequestParameterData> Headers { get; }
     }
 }

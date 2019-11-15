@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Horizon.Collections\Horizon.Collections.csproj" />
         <ProjectReference Include="..\Horizon.Numerics\Horizon.Numerics.csproj" />
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>$(MSBuildProjectName).Test</_Parameter1>
@@ -14,6 +15,24 @@
 
     <ItemGroup>
       <None Remove="Horizon.Reflection.csproj.DotSettings" />
+      <None Remove="Data_Old\**" />
+      <None Remove="Extensions\**" />
+      <None Remove="Msil\**" />
+      <None Remove="Xml\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Data_Old\**" />
+      <Compile Remove="Extensions\**" />
+      <Compile Remove="Msil\**" />
+      <Compile Remove="Xml\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Data_Old\**" />
+      <EmbeddedResource Remove="Extensions\**" />
+      <EmbeddedResource Remove="Msil\**" />
+      <EmbeddedResource Remove="Xml\**" />
     </ItemGroup>
 
 </Project>

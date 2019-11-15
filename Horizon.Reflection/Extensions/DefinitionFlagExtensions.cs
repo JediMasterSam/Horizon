@@ -22,6 +22,10 @@ namespace Horizon.Reflection
             {
                 definitionFlags = DefinitionFlags.Primitive;
             }
+            else if (type.IsEnum)
+            {
+                definitionFlags = DefinitionFlags.Enum;
+            }
             else
             {
                 definitionFlags = DefinitionFlags.Value;

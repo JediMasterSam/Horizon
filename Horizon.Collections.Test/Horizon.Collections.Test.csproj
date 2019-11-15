@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Horizon.Collections\Horizon.Collections.csproj" />
+      <ProjectReference Include="..\Horizon.Diagnostics\Horizon.Diagnostics.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+      <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
+    </ItemGroup>
+
+</Project>

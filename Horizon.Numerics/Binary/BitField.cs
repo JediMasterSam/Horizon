@@ -6,7 +6,7 @@ namespace Horizon.Numerics
     /// Represents a sequence of bits.
     /// </summary>
     /// <typeparam name="T">Enum type.</typeparam>
-    public struct BitField<T> where T : Enum
+    public readonly struct BitField<T> where T : Enum
     {
         /// <summary>
         /// The sequence of bits for the current <see cref="BitField{T}"/>.

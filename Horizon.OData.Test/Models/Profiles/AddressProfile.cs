@@ -4,7 +4,7 @@
     {
     }
 
-    public interface IAddressController : IController
+    public interface IAddressController
     {
     }
 }

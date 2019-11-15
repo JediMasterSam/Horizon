@@ -27,20 +27,10 @@ namespace Horizon.Reflection
         /// Predefined value type.
         /// </summary>
         Primitive = 8 | Value,
-
+        
         /// <summary>
-        /// Constructed generic type.
+        /// Named constant.
         /// </summary>
-        ConstructedGeneric = 16,
-
-        /// <summary>
-        /// Deconstructed generic type.
-        /// </summary>
-        DeconstructedGeneric = 32,
-
-        /// <summary>
-        /// Generic type.
-        /// </summary>
-        Generic = ConstructedGeneric | DeconstructedGeneric,
+        Enum = 16 | Value
     }
 }

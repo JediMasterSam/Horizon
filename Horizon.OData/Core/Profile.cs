@@ -2,7 +2,7 @@
 
 namespace Horizon.OData
 {
-    public abstract class Profile<TController> : IProfile where TController : IController
+    public abstract class Profile<TController> : IProfile
     {
         protected Profile()
         {

@@ -2,14 +2,26 @@
 {
     public class BaseType
     {
+        /// <summary>
+        /// PublicField
+        /// </summary>
         public int PublicField;
 
+        /// <summary>
+        /// InternalField
+        /// </summary>
         internal int InternalField;
 
+        /// <summary>
+        /// ProtectedField
+        /// </summary>
         protected int ProtectedField;
 
+        /// <summary>
+        /// PrivateField
+        /// </summary>
         private int PrivateField;
-
+        
         public int PublicProperty { get; set; }
 
         internal int InternalProperty { get; set; }
